@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Feud - TV</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 1920px;
+      height: 1080px;
+      background: #000;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    
+    /* Fundo com gradiente animado */
+    .background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, #1a237e 0%, #000428 100%);
+      animation: bgPulse 10s ease-in-out infinite;
+    }
+    
+    @keyframes bgPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    .main-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    /* Painel esquerdo - Equipe 1 */
+    .team-panel {
+      position: absolute;
+      width: 320px;
+      height: 420px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    
+    .team-panel.left {
+      left: 80px;
+    }
+    
+    .team-panel.right {
+      right: 80px;
+    }
+    
+    .team-score-box {
+      background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+      border: 8px solid #ffd700;
+      border-radius: 25px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.5), inset 0 0 30px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .team-score-box::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+      z-index: -1;
+      border-radius: 25px;
+      animation: borderRotate 3s linear infinite;
+    }
+    
+    @keyframes borderRotate {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    
+    .team-name {
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+    }
+    
+    .team-points {
+      font-size: 90px;
+      font-weight: 900;
+      color: #ffeb3b;
+      text-shadow: 4px 4px 8px rgba(0,0,0,0.8), 0 0 20px rgba(255, 235, 59, 0.5);
+      line-height: 1;
+    }
+    
+    /* X's de erro para cada equipe */
+    .team-strikes {
+      background: rgba(0, 0, 0, 0.5);
+      border: 6px solid #e53935;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      box-shadow: 0 0 30px rgba(229, 57, 53, 0.3);
+    }
+    
+    .strike-x {
+      width: 85px;
+      height: 85px;
+      background: linear-gradient(135deg, #424242 0%, #212121 100%);
+      border: 5px solid #616161;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 60px;
+      font-weight: 900;
+      color: #424242;
+      transition: all 0.4s;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+    
+    .strike-x.active {
+      background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+      border-color: #ff1744;
+      color: #fff;
+      animation: strikeSlam 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 0 0 40px rgba(244, 67, 54, 1), inset 0 0 20px rgba(0,0,0,0.3);
+    }
+    
+    @keyframes strikeSlam {
+      0% { 
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+      }
+      50% { 
+        transform: scale(1.3) rotate(0deg);
+      }
+      100% { 
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+    
+    /* Board central */
+    .board-container {
+      width: 1100px;
+      height: 780px;
+      position: relative;
+      background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+      border-radius: 50%;
+      border: 18px solid #ffd700;
+      box-shadow: 0 0 100px rgba(255, 215, 0, 0.8), inset 0 0 80px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 70px 90px;
+    }
+    
+    /* Luzes LED animadas */
+    .led-ring {
+      position: absolute;
+      width: calc(100% + 40px);
+      height: calc(100% + 40px);
+      border-radius: 50%;
+      border: 8px solid transparent;
+      animation: ledPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes ledPulse {
+      0%, 100% { 
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.6),
+                    0 0 60px rgba(255, 215, 0, 0.4),
+                    inset 0 0 40px rgba(255, 215, 0, 0.2);
+      }
+      50% { 
+        box-shadow: 0 0 60px rgba(255, 215, 0, 1),
+                    0 0 100px rgba(255, 215, 0, 0.6),
+                    inset 0 0 60px rgba(255, 215, 0, 0.4);
+      }
+    }
+    
+    /* Pergunta */
+    .question {
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      font-size: 48px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 45px;
+      text-shadow: 4px 4px 8px rgba(0,0,0,0.9);
+      letter-spacing: 2px;
+      z-index: 10;
+      line-height: 1.2;
+    }
+    
+    /* Grid de respostas */
+    .answers-grid {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 10;
+    }
+    
+    .answer-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+    
+    .answer-item {
+      background: linear-gradient(135deg, #0d47a1 0%, #01579b 100%);
+      border: 5px solid #1976d2;
+      border-radius: 10px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      padding: 0 25px;
+      position: relative;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    
+    .answer-item.revealed {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      border-color: #42a5f5;
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(25, 118, 210, 0.6);
+    }
+    
+    .answer-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    
+    .answer-item.revealed::before {
+      opacity: 1;
+    }
+    
+    .answer-number {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+      border: 5px solid #fff;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 36px;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+      margin-right: 22px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      transition: all 0.5s;
+    }
+    
+    .answer-item.revealed .answer-number {
+      background: linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%);
+      color: #000;
+      border-color: #fff;
+      transform: rotate(360deg) scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 235, 59, 0.8);
+    }
+    
+    .answer-content {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.5s;
+    }
+    
+    .answer-item.revealed .answer-content {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .answer-text {
+      color: #fff;
+      font-size: 34px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    
+    .answer-points {
+      font-size: 40px;
+      font-weight: 900;
+      color: #ffeb3b;
+      min-width: 70px;
+      text-align: right;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+  
+  <div class="main-container">
+    <!-- Painel Equipe 1 -->
+    <div class="team-panel left">
+      <div class="team-score-box">
+        <div class="team-name">EQUIPE 1</div>
+        <div class="team-points" id="team1Score">0</div>
+      </div>
+      <div class="team-strikes">
+        <div class="strike-x" id="strike1Team1">✕</div>
+        <div class="strike-x" id="strike2Team1">✕</div>
+        <div class="strike-x" id="strike3Team1">✕</div>
+      </div>
+    </div>
+    
+    <!-- Board Central -->
+    <div class="board-container">
+      <div class="led-ring"></div>
+      
+      <div class="question" id="question">AGUARDANDO PERGUNTA...</div>
+      
+      <div class="answers-grid" id="answersGrid"></div>
+    </div>
+    
+    <!-- Painel Equipe 2 -->
+    <div class="team-panel right">
+      <div class="team-score-box">
+        <div class="team-name">EQUIPE 2</div>
+        <div class="team-points" id="team2Score">0</div>
+      </div>
+      <div class="team-strikes">
+        <div class="strike-x" id="strike1Team2">✕</div>
+        <div class="strike-x" id="strike2Team2">✕</div>
+        <div class="strike-x" id="strike3Team2">✕</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+ const firebaseConfig = {
+  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+  measurementId: "G-NLLMB9THVX"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    onValue(ref(db, 'game'), (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      document.getElementById('question').textContent = data.question || 'AGUARDANDO PERGUNTA...';
+      document.getElementById('team1Score').textContent = data.team1Score || 0;
+      document.getElementById('team2Score').textContent = data.team2Score || 0;
+
+      const grid = document.getElementById('answersGrid');
+      grid.innerHTML = '';
+
+      if (data.answers && data.answers.length > 0) {
+        const numRows = Math.ceil(data.answers.length / 2);
+        
+        for (let i = 0; i < numRows; i++) {
+          const row = document.createElement('div');
+          row.className = 'answer-row';
+          
+          for (let j = 0; j < 2; j++) {
+            const index = i * 2 + j;
+            if (index < data.answers.length) {
+              const answer = data.answers[index];
+              const item = document.createElement('div');
+              item.className = 'answer-item';
+              if (answer.revealed) item.classList.add('revealed');
+              
+              item.innerHTML = `
+                <div class="answer-number">${index + 1}</div>
+                <div class="answer-content">
+                  <div class="answer-text">${answer.text}</div>
+                  <div class="answer-points">${answer.points}</div>
+                </div>
+              `;
+              
+              row.appendChild(item);
+            }
+          }
+          
+          grid.appendChild(row);
+        }
+      }
+
+      // Atualizar X's da Equipe 1
+      for (let i = 1; i <= 3; i++) {
+        const strike = document.getElementById(`strike${i}Team1`);
+        if (data.team1Strikes >= i) {
+          strike.classList.add('active');
+        } else {
+          strike.classList.remove('active');
+        }
+      }
+
+      // Atualizar X's da Equipe 2
+      for (let i = 1; i <= 3; i++) {
+        const strike = document.getElementById(`strike${i}Team2`);
+        if (data.team2Strikes >= i) {
+          strike.classList.add('active');
+        } else {
+          strike.classList.remove('active');
+        }
+      }
+    });
+  </script>
+</body>
+</html>

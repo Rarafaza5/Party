@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Feud - Controle</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      padding: 15px;
+      color: #fff;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 5px;
+      color: #ffeb3b;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .subtitle {
+      font-size: 16px;
+      color: #e3f2fd;
+      opacity: 0.9;
+    }
+    
+    .rounds-navigation {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .nav-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffeb3b;
+    }
+    .round-indicator {
+      background: #ffeb3b;
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .rounds-selector {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+    .round-btn {
+      min-width: 100px;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 12px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .round-btn.active {
+      background: linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%);
+      color: #000;
+      border-color: #ffc107;
+      transform: scale(1.05);
+    }
+    .round-btn:active {
+      transform: scale(0.95);
+    }
+    .nav-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .nav-control-btn {
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 16px;
+    }
+    .nav-control-btn.prev {
+      background: linear-gradient(135deg, #ef6c00 0%, #e65100 100%);
+      color: #fff;
+    }
+    .nav-control-btn.next {
+      background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+      color: #fff;
+    }
+    
+    .control-section {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ffeb3b;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffeb3b;
+    }
+    .section-icon {
+      font-size: 28px;
+    }
+    
+    .current-question {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffeb3b;
+      border: 2px solid #ffeb3b;
+    }
+    
+    .answers-control {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .answer-btn {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      color: #fff;
+      border: 3px solid #64b5f6;
+      padding: 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .answer-btn:active {
+      transform: scale(0.95);
+    }
+    .answer-btn.revealed {
+      background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+      border-color: #66bb6a;
+    }
+    .answer-number {
+      width: 35px;
+      height: 35px;
+      background: #ffeb3b;
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .answer-label {
+      flex: 1;
+      text-align: left;
+      margin-left: 12px;
+    }
+    
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .score-card {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      border: 2px solid #ffeb3b;
+    }
+    .team-label {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #ffeb3b;
+      font-weight: bold;
+    }
+    .score-display {
+      font-size: 52px;
+      font-weight: bold;
+      color: #fff;
+      margin: 10px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .score-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .score-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .score-btn.minus {
+      background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+      color: #fff;
+    }
+    .score-btn.plus {
+      background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+      color: #fff;
+    }
+    .score-btn:active {
+      transform: scale(0.9);
+    }
+    
+    /* Erros por equipe */
+    .strikes-team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .strikes-team-card {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      border: 2px solid #e53935;
+    }
+    .strikes-team-label {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffeb3b;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .strikes-display {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    .strike-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(244, 67, 54, 0.2);
+      border: 4px solid #e53935;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: #e53935;
+      transition: all 0.3s;
+    }
+    .strike-circle.active {
+      background: #e53935;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(244, 67, 54, 0.8);
+    }
+    .strikes-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .strike-btn {
+      background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .strike-btn.remove {
+      background: linear-gradient(135deg, #fb8c00 0%, #ef6c00 100%);
+    }
+    .strike-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .general-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #7b1fa2 0%, #6a1b9a 100%);
+      color: #fff;
+      border: none;
+      padding: 18px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .general-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎮 CONTROLE DO JOGO</h1>
+    <div class="subtitle">Controle o painel da TV em tempo real</div>
+  </div>
+
+  <div class="rounds-navigation">
+    <div class="nav-header">
+      <div class="nav-title">🎯 Navegação de Painéis</div>
+      <div class="round-indicator" id="roundIndicator">Painel 1</div>
+    </div>
+    <div class="rounds-selector" id="roundsSelector"></div>
+    <div class="nav-controls">
+      <button class="nav-control-btn prev" onclick="previousRound()">⬅️ Anterior</button>
+      <button class="nav-control-btn next" onclick="nextRound()">Próximo ➡️</button>
+    </div>
+  </div>
+
+  <div class="control-section">
+    <div class="section-header">
+      <div class="section-title">Pergunta Atual</div>
+      <div class="section-icon">❓</div>
+    </div>
+    <div class="current-question" id="currentQuestion">Carregando...</div>
+  </div>
+
+  <div class="control-section">
+    <div class="section-header">
+      <div class="section-title">Respostas no Painel</div>
+      <div class="section-icon">📋</div>
+    </div>
+    <div class="answers-control" id="answersControl"></div>
+  </div>
+
+  <div class="control-section">
+    <div class="section-header">
+      <div class="section-title">Pontuação das Equipes</div>
+      <div class="section-icon">🏆</div>
+    </div>
+    <div class="score-grid">
+      <div class="score-card">
+        <div class="team-label">EQUIPE 1</div>
+        <div class="score-display" id="team1Display">0</div>
+        <div class="score-controls">
+          <button class="score-btn minus" onclick="addScore(1, -10)">−</button>
+          <button class="score-btn plus" onclick="addScore(1, 10)">+</button>
+        </div>
+      </div>
+      <div class="score-card">
+        <div class="team-label">EQUIPE 2</div>
+        <div class="score-display" id="team2Display">0</div>
+        <div class="score-controls">
+          <button class="score-btn minus" onclick="addScore(2, -10)">−</button>
+          <button class="score-btn plus" onclick="addScore(2, 10)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-section">
+    <div class="section-header">
+      <div class="section-title">Erros por Equipe (X)</div>
+      <div class="section-icon">❌</div>
+    </div>
+    <div class="strikes-team-grid">
+      <!-- Equipe 1 -->
+      <div class="strikes-team-card">
+        <div class="strikes-team-label">EQUIPE 1</div>
+        <div class="strikes-display">
+          <div class="strike-circle" id="strike1Team1">✕</div>
+          <div class="strike-circle" id="strike2Team1">✕</div>
+          <div class="strike-circle" id="strike3Team1">✕</div>
+        </div>
+        <div class="strikes-buttons">
+          <button class="strike-btn" onclick="addStrike(1)">+ X</button>
+          <button class="strike-btn remove" onclick="removeStrike(1)">− X</button>
+        </div>
+      </div>
+      
+      <!-- Equipe 2 -->
+      <div class="strikes-team-card">
+        <div class="strikes-team-label">EQUIPE 2</div>
+        <div class="strikes-display">
+          <div class="strike-circle" id="strike1Team2">✕</div>
+          <div class="strike-circle" id="strike2Team2">✕</div>
+          <div class="strike-circle" id="strike3Team2">✕</div>
+        </div>
+        <div class="strikes-buttons">
+          <button class="strike-btn" onclick="addStrike(2)">+ X</button>
+          <button class="strike-btn remove" onclick="removeStrike(2)">− X</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-section">
+    <div class="section-header">
+      <div class="section-title">Ações Rápidas</div>
+      <div class="section-icon">⚡</div>
+    </div>
+    <button class="general-btn" onclick="hideAllAnswers()">🔒 Esconder Todas Respostas</button>
+    <button class="general-btn" onclick="resetAllStrikes()">🔄 Resetar Todos os Erros</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, onValue, update, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+  measurementId: "G-NLLMB9THVX"
+};
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    window.db = db;
+    window.gameConfig = null;
+    window.currentRoundIndex = 0;
+
+    onValue(ref(db, 'gameConfig'), (snapshot) => {
+      window.gameConfig = snapshot.val();
+      if (window.gameConfig && window.gameConfig.rounds) {
+        renderRoundsSelector();
+        window.currentRoundIndex = window.gameConfig.currentRoundIndex || 0;
+        updateRoundIndicator();
+      }
+    });
+
+    onValue(ref(db, 'game'), (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      document.getElementById('currentQuestion').textContent = data.question || 'Carregando...';
+      document.getElementById('team1Display').textContent = data.team1Score || 0;
+      document.getElementById('team2Display').textContent = data.team2Score || 0;
+
+      // Atualizar X's da Equipe 1
+      for (let i = 1; i <= 3; i++) {
+        const circle = document.getElementById(`strike${i}Team1`);
+        if (data.team1Strikes >= i) {
+          circle.classList.add('active');
+        } else {
+          circle.classList.remove('active');
+        }
+      }
+
+      // Atualizar X's da Equipe 2
+      for (let i = 1; i <= 3; i++) {
+        const circle = document.getElementById(`strike${i}Team2`);
+        if (data.team2Strikes >= i) {
+          circle.classList.add('active');
+        } else {
+          circle.classList.remove('active');
+        }
+      }
+
+      const control = document.getElementById('answersControl');
+      control.innerHTML = '';
+
+      if (data.answers) {
+        data.answers.forEach((answer, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'answer-btn';
+          if (answer.revealed) btn.classList.add('revealed');
+          
+          btn.innerHTML = `
+            <div class="answer-number">${index + 1}</div>
+            <div class="answer-label">${answer.text}</div>
+          `;
+          btn.onclick = () => toggleAnswer(index);
+          control.appendChild(btn);
+        });
+      }
+    });
+
+    function renderRoundsSelector() {
+      const selector = document.getElementById('roundsSelector');
+      selector.innerHTML = '';
+      
+      if (window.gameConfig && window.gameConfig.rounds) {
+        window.gameConfig.rounds.forEach((round, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'round-btn';
+          if (index === window.currentRoundIndex) btn.classList.add('active');
+          btn.textContent = `Painel ${index + 1}`;
+          btn.onclick = () => switchToRound(index);
+          selector.appendChild(btn);
+        });
+      }
+    }
+
+    function updateRoundIndicator() {
+      document.getElementById('roundIndicator').textContent = `Painel ${window.currentRoundIndex + 1}`;
+      renderRoundsSelector();
+    }
+
+    window.switchToRound = async (index) => {
+      if (!window.gameConfig || !window.gameConfig.rounds[index]) return;
+      
+      window.currentRoundIndex = index;
+      const round = window.gameConfig.rounds[index];
+      
+      await update(ref(db, 'gameConfig'), { currentRoundIndex: index });
+      await set(ref(db, 'game'), {
+        question: round.question,
+        answers: round.answers.map(a => ({ ...a, revealed: false })),
+        team1Score: 0,
+        team2Score: 0,
+        team1Strikes: 0,
+        team2Strikes: 0
+      });
+      
+      updateRoundIndicator();
+    };
+
+    window.previousRound = () => {
+      if (window.currentRoundIndex > 0) {
+        switchToRound(window.currentRoundIndex - 1);
+      }
+    };
+
+    window.nextRound = () => {
+      if (window.gameConfig && window.currentRoundIndex < window.gameConfig.rounds.length - 1) {
+        switchToRound(window.currentRoundIndex + 1);
+      }
+    };
+
+    window.toggleAnswer = async (index) => {
+      const snapshot = await get(ref(db, 'game/answers'));
+      const answers = snapshot.val();
+      answers[index].revealed = !answers[index].revealed;
+      await update(ref(db, 'game'), { answers });
+    };
+
+    window.addScore = async (team, points) => {
+      const snapshot = await get(ref(db, `game/team${team}Score`));
+      const current = snapshot.val() || 0;
+      await update(ref(db, 'game'), { [`team${team}Score`]: Math.max(0, current + points) });
+    };
+
+    window.addStrike = async (team) => {
+      const snapshot = await get(ref(db, `game/team${team}Strikes`));
+      const current = snapshot.val() || 0;
+      if (current < 3) {
+        await update(ref(db, 'game'), { [`team${team}Strikes`]: current + 1 });
+      }
+    };
+
+    window.removeStrike = async (team) => {
+      const snapshot = await get(ref(db, `game/team${team}Strikes`));
+      const current = snapshot.val() || 0;
+      await update(ref(db, 'game'), { [`team${team}Strikes`]: Math.max(0, current - 1) });
+    };
+
+    window.resetAllStrikes = async () => {
+      await update(ref(db, 'game'), { 
+        team1Strikes: 0,
+        team2Strikes: 0
+      });
+    };
+
+    window.hideAllAnswers = async () => {
+      const snapshot = await get(ref(db, 'game/answers'));
+      const answers = snapshot.val();
+      if (answers) {
+        answers.forEach(a => a.revealed = false);
+        await update(ref(db, 'game'), { answers });
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Feud - Configuração</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 25px;
+      padding: 45px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    }
+    .header-config {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 4px solid #9c27b0;
+    }
+    h1 {
+      color: #4a148c;
+      font-size: 42px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    .subtitle-config {
+      color: #7b1fa2;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    /* Navegação de painéis */
+    .rounds-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .round-tab {
+      padding: 15px 25px;
+      background: #e1bee7;
+      border: 3px solid #ba68c8;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #4a148c;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .round-tab:hover {
+      background: #ce93d8;
+    }
+    .round-tab.active {
+      background: linear-gradient(135deg, #7b1fa2 0%, #4a148c 100%);
+      color: #fff;
+      border-color: #4a148c;
+    }
+    .round-tab .remove-round {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      background: #e53935;
+      color: #fff;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .add-round-btn {
+      padding: 15px 25px;
+      background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #fff;
+      transition: all 0.3s;
+    }
+    .add-round-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .config-card {
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 25px;
+      border: 3px solid #9c27b0;
+      box-shadow: 0 5px 20px rgba(156, 39, 176, 0.2);
+      display: none;
+    }
+    
+    .config-card.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .card-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4a148c;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card-icon {
+      font-size: 32px;
+    }
+    
+    label {
+      display: block;
+      color: #4a148c;
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 18px;
+      border: 3px solid #ba68c8;
+      border-radius: 12px;
+      font-size: 17px;
+      transition: all 0.3s;
+      background: #fff;
+      color: #333;
+    }
+    
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: #7b1fa2;
+      box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+    }
+    
+    .hint-text {
+      color: #7b1fa2;
+      font-size: 15px;
+      margin-top: 8px;
+      font-style: italic;
+    }
+    
+    .answers-config {
+      margin-bottom: 20px;
+    }
+    
+    .answer-config-item {
+      display: grid;
+      grid-template-columns: 60px 1fr 120px 50px;
+      gap: 12px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    
+    .answer-number-badge {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #7b1fa2 0%, #4a148c 100%);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    input[type="number"] {
+      padding: 15px;
+      border: 3px solid #ba68c8;
+      border-radius: 12px;
+      font-size: 17px;
+      text-align: center;
+      font-weight: bold;
+      background: #fff;
+    }
+    
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #7b1fa2;
+      box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+    }
+    
+    .remove-answer-btn {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .remove-answer-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .add-answer-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+      color: #fff;
+      border: none;
+      padding: 18px;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 15px;
+      box-shadow: 0 5px 15px rgba(67, 160, 71, 0.4);
+    }
+    
+    .add-answer-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .main-btn {
+      width: 100%;
+      padding: 25px;
+      border: none;
+      border-radius: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    .save-btn {
+      background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+      color: #fff;
+    }
+    
+    .save-btn:hover {
+      transform: translateY(-3px);
+    }
+    
+    .reset-btn {
+      background: linear-gradient(135deg, #ef6c00 0%, #e65100 100%);
+      color: #fff;
+    }
+    
+    .reset-btn:hover {
+      transform: translateY(-3px);
+    }
+    
+    .success-message {
+      background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+      color: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      font-weight: bold;
+      margin-top: 20px;
+      display: none;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-config">
+      <h1>⚙️ CONFIGURAÇÃO DO JOGO</h1>
+      <div class="subtitle-config">Configure múltiplas perguntas para o seu jogo</div>
+    </div>
+
+    <div class="rounds-nav" id="roundsNav">
+      <button class="round-tab active" onclick="switchRound(0)">
+        Painel 1
+        <button class="remove-round" onclick="removeRound(0, event)">×</button>
+      </button>
+      <button class="add-round-btn" onclick="addNewRound()">➕ Novo Painel</button>
+    </div>
+
+    <div id="roundsContainer"></div>
+
+    <button class="main-btn save-btn" onclick="saveAllGame()">
+      💾 SALVAR TODOS OS PAINÉIS
+    </button>
+    
+    <button class="main-btn reset-btn" onclick="resetGame()">
+      🔄 RESETAR JOGO COMPLETO
+    </button>
+
+    <div class="success-message" id="successMessage">
+      ✓ Jogo configurado e salvo com sucesso!
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+  measurementId: "G-NLLMB9THVX"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    window.db = db;
+    window.currentRound = 0;
+    window.rounds = [createEmptyRound()];
+
+    function createEmptyRound() {
+      return {
+        question: '',
+        answers: Array(6).fill(null).map(() => ({ text: '', points: 0 }))
+      };
+    }
+
+    renderRounds();
+    loadExistingGame();
+
+    async function loadExistingGame() {
+      const snapshot = await get(ref(db, 'gameConfig'));
+      const data = snapshot.val();
+      if (data && data.rounds) {
+        window.rounds = data.rounds;
+        renderRoundsNav();
+        renderRounds();
+      }
+    }
+
+    function renderRoundsNav() {
+      const nav = document.getElementById('roundsNav');
+      nav.innerHTML = '';
+      
+      window.rounds.forEach((round, index) => {
+        const tab = document.createElement('button');
+        tab.className = 'round-tab' + (index === window.currentRound ? ' active' : '');
+        tab.innerHTML = `
+          Painel ${index + 1}
+          ${window.rounds.length > 1 ? `<button class="remove-round" onclick="removeRound(${index}, event)">×</button>` : ''}
+        `;
+        tab.onclick = () => switchRound(index);
+        nav.appendChild(tab);
+      });
+      
+      const addBtn = document.createElement('button');
+      addBtn.className = 'add-round-btn';
+      addBtn.textContent = '➕ Novo Painel';
+      addBtn.onclick = addNewRound;
+      nav.appendChild(addBtn);
+    }
+
+    function renderRounds() {
+      const container = document.getElementById('roundsContainer');
+      container.innerHTML = '';
+      
+      window.rounds.forEach((round, roundIndex) => {
+        const card = document.createElement('div');
+        card.className = 'config-card' + (roundIndex === window.currentRound ? ' active' : '');
+        card.innerHTML = `
+          <div class="card-title">
+            <span class="card-icon">❓</span>
+            Pergunta do Painel ${roundIndex + 1}
+          </div>
+          <label>Digite a pergunta que aparecerá no painel:</label>
+          <input type="text" class="question-input" data-round="${roundIndex}" placeholder="Ex: Nomeie algo que você encontra na praia" value="${round.question}">
+          <div class="hint-text">Esta será a pergunta exibida no topo do painel da TV</div>
+          
+          <div style="margin-top: 30px;">
+            <div class="card-title">
+              <span class="card-icon">📝</span>
+              Respostas e Pontuações
+            </div>
+            <div class="answers-config" data-round="${roundIndex}">
+              ${round.answers.map((ans, i) => `
+                <div class="answer-config-item">
+                  <div class="answer-number-badge">${i + 1}</div>
+                  <input type="text" placeholder="Digite a resposta" value="${ans.text}" class="answer-text-input" data-round="${roundIndex}" data-index="${i}">
+                  <input type="number" placeholder="Pontos" value="${ans.points || ''}" class="answer-points-input" data-round="${roundIndex}" data-index="${i}" min="0">
+                  <button class="remove-answer-btn" onclick="removeAnswer(${roundIndex}, ${i})">×</button>
+                </div>
+              `).join('')}
+            </div>
+            <button class="add-answer-btn" onclick="addAnswerToRound(${roundIndex})">
+              <span style="font-size: 20px;">➕</span> Adicionar Nova Resposta
+            </button>
+            <div class="hint-text">Adicione as respostas mais populares com suas respectivas pontuações</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      
+      updateInputListeners();
+    }
+
+    function updateInputListeners() {
+      document.querySelectorAll('.question-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const roundIndex = parseInt(e.target.dataset.round);
+          window.rounds[roundIndex].question = e.target.value;
+        });
+      });
+      
+      document.querySelectorAll('.answer-text-input, .answer-points-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const roundIndex = parseInt(e.target.dataset.round);
+          const answerIndex = parseInt(e.target.dataset.index);
+          const isText = e.target.classList.contains('answer-text-input');
+          
+          if (isText) {
+            window.rounds[roundIndex].answers[answerIndex].text = e.target.value;
+          } else {
+            window.rounds[roundIndex].answers[answerIndex].points = parseInt(e.target.value) || 0;
+          }
+        });
+      });
+    }
+
+    window.switchRound = (index) => {
+      window.currentRound = index;
+      renderRoundsNav();
+      document.querySelectorAll('.config-card').forEach((card, i) => {
+        card.classList.toggle('active', i === index);
+      });
+    };
+
+    window.addNewRound = () => {
+      window.rounds.push(createEmptyRound());
+      window.currentRound = window.rounds.length - 1;
+      renderRoundsNav();
+      renderRounds();
+    };
+
+    window.removeRound = (index, event) => {
+      event.stopPropagation();
+      if (window.rounds.length <= 1) {
+        alert('⚠️ Você precisa ter pelo menos um painel!');
+        return;
+      }
+      if (confirm(`Tem certeza que deseja remover o Painel ${index + 1}?`)) {
+        window.rounds.splice(index, 1);
+        if (window.currentRound >= window.rounds.length) {
+          window.currentRound = window.rounds.length - 1;
+        }
+        renderRoundsNav();
+        renderRounds();
+      }
+    };
+
+    window.addAnswerToRound = (roundIndex) => {
+      window.rounds[roundIndex].answers.push({ text: '', points: 0 });
+      renderRounds();
+    };
+
+    window.removeAnswer = (roundIndex, answerIndex) => {
+      if (window.rounds[roundIndex].answers.length <= 1) {
+        alert('⚠️ Você precisa ter pelo menos uma resposta!');
+        return;
+      }
+      window.rounds[roundIndex].answers.splice(answerIndex, 1);
+      renderRounds();
+    };
+
+    window.saveAllGame = async () => {
+      const validRounds = window.rounds.filter(round => {
+        const hasQuestion = round.question.trim();
+        const hasAnswers = round.answers.some(a => a.text.trim());
+        return hasQuestion && hasAnswers;
+      });
+
+      if (validRounds.length === 0) {
+        alert('⚠️ Por favor, configure pelo menos um painel com pergunta e respostas!');
+        return;
+      }
+
+      const cleanedRounds = validRounds.map(round => ({
+        question: round.question.trim(),
+        answers: round.answers
+          .filter(a => a.text.trim())
+          .map(a => ({
+            text: a.text.trim(),
+            points: a.points || 0,
+            revealed: false
+          }))
+      }));
+
+      try {
+        await set(ref(db, 'gameConfig'), {
+          rounds: cleanedRounds,
+          currentRoundIndex: 0
+        });
+
+        await set(ref(db, 'game'), {
+          question: cleanedRounds[0].question,
+          answers: cleanedRounds[0].answers,
+          team1Score: 0,
+          team2Score: 0,
+          wrongCount: 0
+        });
+        
+        const msg = document.getElementById('successMessage');
+        msg.style.display = 'block';
+        setTimeout(() => {
+          msg.style.display = 'none';
+        }, 3000);
+      } catch (error) {
+        alert('❌ Erro ao salvar: ' + error.message);
+      }
+    };
+
+    window.resetGame = async () => {
+      if (confirm('⚠️ Tem certeza que deseja resetar o jogo completo?\n\nIsso vai limpar todas as pontuações e respostas reveladas.')) {
+        try {
+          const snapshot = await get(ref(db, 'gameConfig'));
+          const config = snapshot.val();
+          
+          if (config && config.rounds) {
+            await set(ref(db, 'gameConfig/currentRoundIndex'), 0);
+            
+            await set(ref(db, 'game'), {
+              question: config.rounds[0].question,
+              answers: config.rounds[0].answers.map(a => ({ ...a, revealed: false })),
+              team1Score: 0,
+              team2Score: 0,
+              wrongCount: 0
+            });
+            
+            alert('✅ Jogo resetado com sucesso!');
+          }
+        } catch (error) {
+          alert('❌ Erro ao resetar: ' + error.message);
+        }
+      }
+    };
+  </script>
+</body>
+</html>
