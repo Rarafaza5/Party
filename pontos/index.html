@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placar - TV</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 72px;
+            font-weight: bold;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 32px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .scoreboard {
+            display: grid;
+            gap: 30px;
+            width: 100%;
+            max-width: 1600px;
+        }
+
+        .scoreboard.two-players {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .scoreboard.three-players {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .scoreboard.four-players {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .scoreboard.many-players {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .player-display {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .player-display.winner {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: gold;
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+        }
+
+        .player-name {
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .score {
+            color: #ffd700;
+            font-size: 120px;
+            font-weight: bold;
+            text-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            line-height: 1;
+        }
+
+        .winner-crown {
+            font-size: 60px;
+            margin-bottom: 10px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .waiting {
+            color: white;
+            font-size: 48px;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .rank {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏆 PLACAR DO JOGO 🏆</h1>
+    </div>
+
+    <div id="scoreboard" class="scoreboard">
+        <div class="waiting">Aguardando início do jogo...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // IMPORTANTE: Substitua com suas configurações do Firebase (as mesmas da página de controlo)
+       const firebaseConfig = {
+  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+  measurementId: "G-NLLMB9THVX"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const gameRef = ref(db, 'game');
+        onValue(gameRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.players) {
+                displayScoreboard(data.players);
+            }
+        });
+
+        function displayScoreboard(players) {
+            const scoreboard = document.getElementById('scoreboard');
+            
+            // Ordena jogadores por pontuação
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const maxScore = sortedPlayers[0].score;
+            
+            // Define grid baseado no número de jogadores
+            const numPlayers = players.length;
+            scoreboard.className = 'scoreboard';
+            if (numPlayers === 2) {
+                scoreboard.classList.add('two-players');
+            } else if (numPlayers === 3) {
+                scoreboard.classList.add('three-players');
+            } else if (numPlayers === 4) {
+                scoreboard.classList.add('four-players');
+            } else {
+                scoreboard.classList.add('many-players');
+            }
+
+            scoreboard.innerHTML = sortedPlayers.map((player, index) => {
+                const isWinner = player.score === maxScore && maxScore > 0;
+                const rankEmojis = ['🥇', '🥈', '🥉'];
+                const rankEmoji = index < 3 ? rankEmojis[index] : `${index + 1}º`;
+                
+                return `
+                    <div class="player-display ${isWinner ? 'winner' : ''}">
+                        <div class="rank">${rankEmoji}</div>
+                        ${isWinner ? '<div class="winner-crown">👑</div>' : ''}
+                        <div class="player-name">${player.name}</div>
+                        <div class="score">${player.score}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

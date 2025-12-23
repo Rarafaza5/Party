@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlo de Pontuação</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .setup-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .players-section {
+            display: none;
+        }
+
+        .player-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .player-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .score-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .score-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .score-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        .btn-minus {
+            background: #ff6b6b;
+        }
+
+        .btn-plus {
+            background: #51cf66;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-group button {
+            flex: 0 0 auto;
+            width: auto;
+            padding: 12px 20px;
+        }
+
+        .reset-btn {
+            background: #ff6b6b;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Controlo de Pontuação</h1>
+        
+        <div class="setup-section" id="setupSection">
+            <label for="numPlayers">Número de Jogadores:</label>
+            <input type="number" id="numPlayers" min="2" max="8" value="2">
+            <button onclick="setupPlayers()" style="margin-top: 15px;">Iniciar Jogo</button>
+        </div>
+
+        <div class="players-section" id="playersSection">
+            <div id="playersList"></div>
+            <button class="reset-btn" onclick="resetGame()">Reiniciar Jogo</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // IMPORTANTE: Substitua com suas configurações do Firebase
+     const firebaseConfig = {
+  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+  measurementId: "G-NLLMB9THVX"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        window.db = db;
+
+        // Carrega dados do Firebase ao iniciar
+        const gameRef = ref(db, 'game');
+        onValue(gameRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.players) {
+                loadGame(data);
+            }
+        });
+
+        window.setupPlayers = function() {
+            const numPlayers = parseInt(document.getElementById('numPlayers').value);
+            const players = [];
+            
+            for (let i = 0; i < numPlayers; i++) {
+                players.push({
+                    id: i,
+                    name: `Jogador ${i + 1}`,
+                    score: 0
+                });
+            }
+
+            set(ref(db, 'game'), {
+                players: players,
+                numPlayers: numPlayers
+            });
+
+            renderPlayers(players);
+        }
+
+        function loadGame(data) {
+            renderPlayers(data.players);
+        }
+
+        function renderPlayers(players) {
+            const playersList = document.getElementById('playersList');
+            playersList.innerHTML = '';
+
+            players.forEach(player => {
+                const card = document.createElement('div');
+                card.className = 'player-card';
+                card.innerHTML = `
+                    <input type="text" class="player-name" value="${player.name}" 
+                           onchange="updatePlayerName(${player.id}, this.value)">
+                    <div class="score-display" id="score-${player.id}">${player.score}</div>
+                    <div class="score-controls">
+                        <button class="score-btn btn-minus" onclick="updateScore(${player.id}, -1)">-1</button>
+                        <button class="score-btn btn-plus" onclick="updateScore(${player.id}, 1)">+1</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="custom-${player.id}" placeholder="Pontos personalizados">
+                        <button onclick="addCustomScore(${player.id})">Adicionar</button>
+                    </div>
+                `;
+                playersList.appendChild(card);
+            });
+
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('playersSection').classList.add('show');
+        }
+
+        window.updateScore = function(playerId, change) {
+            const gameRef = ref(db, 'game');
+            onValue(gameRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.players) {
+                    data.players[playerId].score += change;
+                    set(ref(db, 'game'), data);
+                }
+            }, { onlyOnce: true });
+        }
+
+        window.addCustomScore = function(playerId) {
+            const input = document.getElementById(`custom-${playerId}`);
+            const value = parseInt(input.value);
+            if (!isNaN(value)) {
+                updateScore(playerId, value);
+                input.value = '';
+            }
+        }
+
+        window.updatePlayerName = function(playerId, newName) {
+            const gameRef = ref(db, 'game');
+            onValue(gameRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.players) {
+                    data.players[playerId].name = newName;
+                    set(ref(db, 'game'), data);
+                }
+            }, { onlyOnce: true });
+        }
+
+        window.resetGame = function() {
+            if (confirm('Tem certeza que deseja reiniciar o jogo?')) {
+                set(ref(db, 'game'), null);
+                document.getElementById('setupSection').classList.remove('hidden');
+                document.getElementById('playersSection').classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
